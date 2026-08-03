@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title><%= viewData.title %> | Library App</title>
+  <title>
+  <%= typeof viewData !== 'undefined' ? viewData.title : 'Library App' %>
+</title>
 
   <link href="/css/style.css" rel="stylesheet">
 
@@ -52,6 +54,13 @@
     <i class="fas fa-envelope mr-3"></i>
     <span>Contact</span>
   </a>
+  <a
+  href="/main-point"
+  class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700 transition duration-200"
+>
+  <i class="fas fa-book mr-3"></i>
+  <span>Books</span>
+</a>
 
 </nav>
 
@@ -90,7 +99,9 @@
 
           <div>
             <h1 class="text-2xl font-bold text-gray-800">
-              <%= viewData.title %>
+              <% if (typeof viewData !== 'undefined') { %>
+                 <%= viewData.title %>
+              <% } %>
             </h1>
           </div>
 

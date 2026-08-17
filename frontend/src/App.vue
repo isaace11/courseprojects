@@ -20,6 +20,7 @@ import { RouterLink, RouterView } from 'vue-router';
               <i class="fas fa-home mr-3"></i>
               <span>Home</span>
             </RouterLink>
+
             <RouterLink
               to="/about"
               class="flex items-center rounded-lg px-4 py-3 transition duration-200 hover:bg-gray-700"
@@ -27,12 +28,21 @@ import { RouterLink, RouterView } from 'vue-router';
               <i class="fas fa-info-circle mr-3"></i>
               <span>About</span>
             </RouterLink>
+
             <RouterLink
               to="/contact"
               class="flex items-center rounded-lg px-4 py-3 transition duration-200 hover:bg-gray-700"
             >
               <i class="fas fa-envelope mr-3"></i>
               <span>Contact</span>
+            </RouterLink>
+
+            <RouterLink
+              to="/books"
+              class="flex items-center rounded-lg px-4 py-3 transition duration-200 hover:bg-gray-700"
+            >
+              <i class="fas fa-book mr-3"></i>
+              <span>Books</span>
             </RouterLink>
           </nav>
         </div>
@@ -42,6 +52,7 @@ import { RouterLink, RouterView } from 'vue-router';
             <div class="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500">
               <i class="fas fa-user text-white"></i>
             </div>
+
             <div>
               <p class="text-sm font-semibold">Admin User</p>
               <p class="text-xs text-gray-400">admin@example.com</p>
@@ -58,6 +69,7 @@ import { RouterLink, RouterView } from 'vue-router';
                 {{ $route.meta.title }}
               </h1>
             </div>
+
             <div class="flex items-center space-x-4">
               <button
                 class="rounded-lg p-2 text-gray-600 transition duration-200 hover:bg-gray-100"
@@ -65,6 +77,7 @@ import { RouterLink, RouterView } from 'vue-router';
               >
                 <i class="fas fa-search"></i>
               </button>
+
               <div
                 class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-blue-500 transition duration-200 hover:bg-blue-600"
               >

@@ -1,16 +1,32 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
+
 import { BookService } from '@/services/BookService';
+import BookCategoryService from '@/services/BookCategoryService';
+import { formatToCOP } from '@/utils/formatters';
 
 const books = BookService.getBooks();
+const filteredBooks = ref(books);
+
+const bookCategories = BookCategoryService.getUniqueBookCategories();
+const selectedCategory = ref('');
 
 function deleteLastBook(): void {
   BookService.deleteLastBook();
 }
+
+watch(selectedCategory, (newCategory) => {
+  if (newCategory) {
+    filteredBooks.value = books.filter((book) => book.category === newCategory);
+  } else {
+    filteredBooks.value = books;
+  }
+});
 </script>
 
 <template>
   <section>
-    <div class="max-w-7xl mx-auto">
+    <div class="mx-auto max-w-7xl">
       <div class="mb-6 flex justify-end gap-3">
         <button
           type="button"
@@ -29,52 +45,65 @@ function deleteLastBook(): void {
         </RouterLink>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="book in books" :key="book.id">
+      <div class="mb-6 flex justify-end">
+        <select
+          v-model="selectedCategory"
+          class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-300 focus:outline-none focus:ring"
+        >
+          <option value="">All Categories</option>
+
+          <option v-for="category in bookCategories" :key="category" :value="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div v-for="book in filteredBooks" :key="book.id">
           <div
-            class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 p-6 border border-gray-200"
+            class="rounded-lg border border-gray-200 bg-white p-6 shadow-md transition duration-300 hover:shadow-lg"
           >
-            <div class="flex justify-between items-center mb-2">
+            <div class="mb-2 flex items-center justify-between">
               <h3 class="text-xl font-semibold text-gray-800">
                 {{ book.title }}
               </h3>
 
               <span
                 v-if="book.stock > 0"
-                class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full ml-2"
+                class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
               >
                 {{ book.stock }} available
               </span>
 
-              <span v-else class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full ml-2">
+              <span v-else class="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs text-red-800">
                 Not available
               </span>
             </div>
 
-            <div class="flex justify-center mb-4">
+            <div class="mb-4 flex justify-center">
               <img
                 src="https://picsum.photos/seed/picsum/536/354"
                 alt="Book Cover"
-                class="object-cover rounded shadow-sm w-full h-auto"
+                class="h-auto w-full rounded object-cover shadow-sm"
               />
             </div>
 
-            <p class="text-gray-500 text-sm mb-3">
+            <p class="mb-3 text-sm text-gray-500">
               <i class="fas fa-tag mr-2"></i>
               {{ book.category }}
             </p>
 
-            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+            <div class="mb-4 rounded-lg bg-gray-50 p-3">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Price:</span>
-                <span class="font-semibold">${{ book.price }}</span>
+                <span class="font-semibold"> ${{ formatToCOP(book.price) }} COP </span>
               </div>
             </div>
 
             <div class="flex justify-center">
               <RouterLink
                 :to="`/books/${book.id}`"
-                class="bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold py-2 px-3 rounded transition duration-300"
+                class="rounded bg-blue-100 px-3 py-2 font-semibold text-blue-600 transition duration-300 hover:bg-blue-200"
               >
                 More info <i class="fas fa-info-circle"></i>
               </RouterLink>

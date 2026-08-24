@@ -1,6 +1,7 @@
 import { createPinia } from 'pinia';
 import { watch } from 'vue';
 import { bookSeeder } from '@/stores/bookseeder';
+import { reviewSeeder } from '@/stores/reviewseeder';
 
 export default class PiniaConfig {
   public static init() {
@@ -15,11 +16,14 @@ export default class PiniaConfig {
         book: {
           books: bookSeeder,
         },
+        review: {
+          reviews: reviewSeeder,
+        },
       };
 
       localStorage.setItem('piniaState', JSON.stringify(pinia.state.value));
     }
-// hace que cualquier cambio futuro en los libros se guarde automáticamente
+    // hace que cualquier cambio futuro en los libros se guarde automáticamente
     watch(
       pinia.state,
       (state) => {

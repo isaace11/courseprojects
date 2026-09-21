@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
+import type { ReviewInterface } from '@/interfaces/ReviewInterface';
 import { ReviewService } from '@/services/ReviewService';
 
 const props = defineProps<{
   bookId: number;
 }>();
 
-const bookReviews = computed(() => ReviewService.getReviewsByBookId(props.bookId));
+const reviews = ref<ReviewInterface[]>([]);
 
-const reviewForm = ref({
+const form = ref({
   rating: 5,
   comment: '',
   author: '',
@@ -17,28 +18,30 @@ const reviewForm = ref({
 
 const isSubmitting = ref(false);
 
-function submitReview(): void {
-  if (!reviewForm.value.comment.trim()) return;
+async function submitReview() {
+  if (!form.value.comment.trim()) return;
 
   isSubmitting.value = true;
 
-  ReviewService.createReview({
+  await ReviewService.createReview({
     bookId: props.bookId,
-    rating: Math.min(5, Math.max(1, reviewForm.value.rating)),
-    comment: reviewForm.value.comment.trim(),
-    author: reviewForm.value.author.trim() || undefined,
+    rating: Math.min(5, Math.max(1, form.value.rating)),
+    comment: form.value.comment.trim(),
+    author: form.value.author.trim() || undefined,
   });
 
-  reviewForm.value = {
+  form.value = {
     rating: 5,
     comment: '',
     author: '',
   };
 
   isSubmitting.value = false;
+
+  await getReviews();
 }
 
-function formatReviewDate(iso?: string): string {
+function formatDate(iso?: string): string {
   if (!iso) return '';
 
   return new Date(iso).toLocaleDateString('es-CO', {
@@ -47,35 +50,53 @@ function formatReviewDate(iso?: string): string {
     day: 'numeric',
   });
 }
+
+async function getReviews() {
+  reviews.value = await ReviewService.getReviewsByBookId(props.bookId);
+}
+
+onMounted(async () => {
+  await getReviews();
+});
 </script>
 
 <template>
   <div class="space-y-6">
-    <h3 class="text-lg font-semibold text-gray-800">Reviews</h3>
+    <h3 class="text-lg font-semibold text-gray-800">
+      Reviews
+    </h3>
 
     <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-      <h4 class="mb-3 text-sm font-medium text-gray-700">Add a review</h4>
+      <h4 class="mb-3 text-sm font-medium text-gray-700">
+        Add a review
+      </h4>
 
       <form class="space-y-3" @submit.prevent="submitReview">
         <div>
-          <label for="rating" class="mb-1 block text-sm text-gray-600"> Rating </label>
+          <label for="rating" class="mb-1 block text-sm text-gray-600">
+            Rating
+          </label>
 
           <select
             id="rating"
-            v-model.number="reviewForm.rating"
+            v-model.number="form.rating"
             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-300 focus:outline-none focus:ring"
             required
           >
-            <option v-for="n in 5" :key="n" :value="n">{{ n }} star{{ n > 1 ? 's' : '' }}</option>
+            <option v-for="n in 5" :key="n" :value="n">
+              {{ n }} star{{ n > 1 ? 's' : '' }}
+            </option>
           </select>
         </div>
 
         <div>
-          <label for="comment" class="mb-1 block text-sm text-gray-600"> Comment </label>
+          <label for="comment" class="mb-1 block text-sm text-gray-600">
+            Comment
+          </label>
 
           <textarea
             id="comment"
-            v-model="reviewForm.comment"
+            v-model="form.comment"
             rows="3"
             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-300 focus:outline-none focus:ring"
             placeholder="Write your review..."
@@ -90,7 +111,7 @@ function formatReviewDate(iso?: string): string {
 
           <input
             id="author"
-            v-model="reviewForm.author"
+            v-model="form.author"
             type="text"
             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-300 focus:outline-none focus:ring"
             placeholder="Name"
@@ -99,7 +120,7 @@ function formatReviewDate(iso?: string): string {
 
         <button
           type="submit"
-          :disabled="isSubmitting || !reviewForm.comment.trim()"
+          :disabled="isSubmitting || !form.comment.trim()"
           class="rounded bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Post review
@@ -109,7 +130,7 @@ function formatReviewDate(iso?: string): string {
 
     <ul class="space-y-4">
       <li
-        v-for="review in bookReviews"
+        v-for="review in reviews"
         :key="review.id"
         class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
       >
@@ -118,7 +139,10 @@ function formatReviewDate(iso?: string): string {
             {{ review.author || 'Anonymous' }}
           </span>
 
-          <span class="text-sm text-amber-500" :title="`${review.rating} stars`">
+          <span
+            class="text-sm text-amber-500"
+            :title="`${review.rating} stars`"
+          >
             {{ '★'.repeat(review.rating) }}{{ '☆'.repeat(5 - review.rating) }}
           </span>
         </div>
@@ -127,12 +151,18 @@ function formatReviewDate(iso?: string): string {
           {{ review.comment }}
         </p>
 
-        <p v-if="review.createdAt" class="mt-2 text-xs text-gray-400">
-          {{ formatReviewDate(review.createdAt) }}
+        <p
+          v-if="review.createdAt"
+          class="mt-2 text-xs text-gray-400"
+        >
+          {{ formatDate(review.createdAt) }}
         </p>
       </li>
 
-      <li v-if="bookReviews.length === 0" class="py-4 text-sm text-gray-500">
+      <li
+        v-if="reviews.length === 0"
+        class="py-4 text-sm text-gray-500"
+      >
         No reviews yet. Be the first to review!
       </li>
     </ul>

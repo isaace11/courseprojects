@@ -1,65 +1,30 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 
+import type { BookInterface } from '@/interfaces/BookInterface';
 import { BookService } from '@/services/BookService';
-import BookCategoryService from '@/services/BookCategoryService';
-import { formatToCOP } from '@/utils/formatters';
 
-const books = BookService.getBooks();
-const filteredBooks = ref(books);
+const books = ref<BookInterface[]>([]);
 
-const bookCategories = BookCategoryService.getUniqueBookCategories();
-const selectedCategory = ref('');
-
-function deleteLastBook(): void {
-  BookService.deleteLastBook();
-}
-
-watch(selectedCategory, (newCategory) => {
-  if (newCategory) {
-    filteredBooks.value = books.filter((book) => book.category === newCategory);
-  } else {
-    filteredBooks.value = books;
-  }
+onMounted(async () => {
+  books.value = await BookService.getBooks();
 });
 </script>
 
 <template>
   <section>
     <div class="mx-auto max-w-7xl">
-      <div class="mb-6 flex justify-end gap-3">
-        <button
-          type="button"
-          class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition duration-200 hover:bg-red-700"
-          @click="deleteLastBook"
-        >
-          Delete Last Book
-        </button>
-
+      <div class="mb-6 flex justify-end">
         <RouterLink
           to="/books/create"
-          class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition duration-200 hover:bg-blue-700"
+          class="inline-block rounded bg-blue-600 px-5 py-2 font-semibold text-white transition hover:bg-blue-700"
         >
-          <i class="fas fa-plus mr-2"></i>
-          Add Book
+          + Add Book
         </RouterLink>
       </div>
 
-      <div class="mb-6 flex justify-end">
-        <select
-          v-model="selectedCategory"
-          class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-300 focus:outline-none focus:ring"
-        >
-          <option value="">All Categories</option>
-
-          <option v-for="category in bookCategories" :key="category" :value="category">
-            {{ category }}
-          </option>
-        </select>
-      </div>
-
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        <div v-for="book in filteredBooks" :key="book.id">
+        <div v-for="book in books" :key="book.id">
           <div
             class="rounded-lg border border-gray-200 bg-white p-6 shadow-md transition duration-300 hover:shadow-lg"
           >
@@ -75,7 +40,10 @@ watch(selectedCategory, (newCategory) => {
                 {{ book.stock }} available
               </span>
 
-              <span v-else class="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs text-red-800">
+              <span
+                v-else
+                class="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs text-red-800"
+              >
                 Not available
               </span>
             </div>
@@ -96,7 +64,7 @@ watch(selectedCategory, (newCategory) => {
             <div class="mb-4 rounded-lg bg-gray-50 p-3">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Price:</span>
-                <span class="font-semibold"> ${{ formatToCOP(book.price) }} COP </span>
+                <span class="font-semibold">${{ book.price }} COP</span>
               </div>
             </div>
 

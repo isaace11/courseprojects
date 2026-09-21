@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Book } from './entities/book.entity.js';
 import { CreateBookDto } from './dto/create-book.dto.js';
+import { Book } from './entities/book.entity.js';
 
 @Injectable()
 export class BooksService {
@@ -22,7 +22,6 @@ export class BooksService {
 
   create(createBookDto: CreateBookDto): Promise<Book> {
     const book = this.booksRepository.create(createBookDto);
-
     return this.booksRepository.save(book);
   }
 }

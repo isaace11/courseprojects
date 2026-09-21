@@ -1,40 +1,8 @@
-import { createPinia } from 'pinia';
-import { watch } from 'vue';
-import { bookSeeder } from '@/stores/bookseeder';
-import { reviewSeeder } from '@/stores/reviewseeder';
+import { createPinia } from 'pinia'
 
 export default class PiniaConfig {
   public static init() {
-    const pinia = createPinia();
-
-    const savedState = localStorage.getItem('piniaState');
-
-    if (savedState) {
-      pinia.state.value = JSON.parse(savedState);
-    } else {
-      pinia.state.value = {
-        book: {
-          books: bookSeeder,
-        },
-        review: {
-          reviews: reviewSeeder,
-        },
-      };
-
-      localStorage.setItem('piniaState', JSON.stringify(pinia.state.value));
-    }
-    // hace que cualquier cambio futuro en los libros se guarde automáticamente
-    watch(
-      pinia.state,
-      (state) => {
-        localStorage.setItem('piniaState', JSON.stringify(state));
-      },
-      { deep: true },
-    );
-
-    return pinia;
+    const pinia = createPinia()
+    return pinia
   }
 }
-
-// crea Pini, revisa si hay datos guardados, si existen los carga, si no existen, usa bookSeeder como datos iniciales.
-// y los guarda en localStorage.

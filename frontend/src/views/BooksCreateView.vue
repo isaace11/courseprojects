@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { BookService } from '@/services/BookService';
+
 import type { CreateBookDTO } from '@/dtos/CreateBookDTO';
+import { BookService } from '@/services/BookService';
 
 const title = ref('');
 const category = ref('');
@@ -9,38 +10,49 @@ const price = ref(0);
 const stock = ref(0);
 const successMessage = ref('');
 
-const submit = () => {
-  const book: CreateBookDTO = {
+async function submitForm() {
+  const newBook: CreateBookDTO = {
     title: title.value,
     category: category.value,
     price: price.value,
     stock: stock.value,
   };
 
-  BookService.createBook(book);
+  try {
+    await BookService.createBook(newBook);
 
-  successMessage.value = 'Book created successfully!';
+    successMessage.value = 'Book created successfully!';
 
-  title.value = '';
-  category.value = '';
-  price.value = 0;
-  stock.value = 0;
-};
+    title.value = '';
+    category.value = '';
+    price.value = 0;
+    stock.value = 0;
+  } catch (error) {
+    console.error(error);
+  }
+}
 </script>
 
 <template>
   <section>
     <div class="mx-auto max-w-3xl">
       <div class="rounded-lg bg-white p-8 shadow-md">
-        <h2 class="mb-6 text-2xl font-bold text-gray-800">Create Book</h2>
+        <h2 class="mb-6 text-2xl font-bold text-gray-800">
+          Create Book
+        </h2>
 
-        <div v-if="successMessage" class="mb-6 rounded-lg bg-green-100 px-4 py-3 text-green-800">
+        <div
+          v-if="successMessage"
+          class="mb-6 rounded-lg bg-green-100 px-4 py-3 text-green-800"
+        >
           {{ successMessage }}
         </div>
 
-        <form class="space-y-6" @submit.prevent="submit">
+        <form class="space-y-6" @submit.prevent="submitForm">
           <div>
-            <label class="mb-2 block font-medium text-gray-700" for="title"> Title </label>
+            <label class="mb-2 block font-medium text-gray-700" for="title">
+              Title
+            </label>
 
             <input
               id="title"
@@ -52,7 +64,9 @@ const submit = () => {
           </div>
 
           <div>
-            <label class="mb-2 block font-medium text-gray-700" for="category"> Category </label>
+            <label class="mb-2 block font-medium text-gray-700" for="category">
+              Category
+            </label>
 
             <input
               id="category"
@@ -64,7 +78,9 @@ const submit = () => {
           </div>
 
           <div>
-            <label class="mb-2 block font-medium text-gray-700" for="price"> Price </label>
+            <label class="mb-2 block font-medium text-gray-700" for="price">
+              Price
+            </label>
 
             <input
               id="price"
@@ -78,7 +94,9 @@ const submit = () => {
           </div>
 
           <div>
-            <label class="mb-2 block font-medium text-gray-700" for="stock"> Stock </label>
+            <label class="mb-2 block font-medium text-gray-700" for="stock">
+              Stock
+            </label>
 
             <input
               id="stock"

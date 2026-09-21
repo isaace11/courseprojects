@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Review } from './review.entity.js';
 
 @Entity()
 export class Book {
@@ -16,4 +18,7 @@ export class Book {
 
   @Column()
   stock: number;
+
+  @OneToMany(() => Review, (review) => review.book)
+  reviews: Review[];
 }

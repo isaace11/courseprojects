@@ -3,6 +3,10 @@ node_modules/
 
 # Código compilado
 dist/
+!backend/dist/
+!backend/dist/**
+!frontend/dist/
+!frontend/dist/**
 
 # Variables de entorno
 .env
